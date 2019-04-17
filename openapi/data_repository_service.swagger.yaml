@@ -30,7 +30,7 @@ paths:
         '200':
           description: Service information returned successfully
           schema:
-            $ref: '#/definitions/ServiceInfoResponse'
+            $ref: '#/definitions/ServiceInfo'
       tags:
         - DataRepositoryService
       x-swagger-router-controller: ga4gh.drs.server
@@ -46,23 +46,23 @@ paths:
         '400':
           description: The request is malformed.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '401':
           description: The request is unauthorized.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '403':
           description: The requester is not authorized to perform this action.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '404':
           description: The requested Data Bundle wasn't found.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '500':
           description: An unexpected error occurred.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
       parameters:
         - name: bundle_id
           in: path
@@ -79,27 +79,27 @@ paths:
         '200':
           description: The Data Object was found successfully.
           schema:
-            $ref: '#/definitions/GetObjectResponse'
+            $ref: '#/definitions/Object'
         '400':
           description: The request is malformed.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '401':
           description: The request is unauthorized.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '404':
           description: The requested Data Object wasn't found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '403':
           description: The requester is not authorized to perform this action.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '500':
           description: An unexpected error occurred.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
       parameters:
         - name: object_id
           in: path
@@ -116,27 +116,27 @@ paths:
         '200':
           description: The access URL was found successfully.
           schema:
-            $ref: '#/definitions/GetAccessURLResponse'
+            $ref: '#/definitions/AccessURL'
         '400':
           description: The request is malformed.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '401':
           description: The request is unauthorized.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '404':
           description: The requested access URL wasn't found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '403':
           description: The requester is not authorized to perform this action.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
         '500':
           description: An unexpected error occurred.
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: '#/definitions/Error'
       parameters:
         - name: object_id
           in: path
@@ -320,15 +320,10 @@ definitions:
           These aliases can be used to represent the Data Object's location in
           a directory (e.g. "bucket/folder/file.name") to make Data Objects
           more discoverable. They might also be used to represent
-  GetObjectResponse:
+
+  AccessURL:
     type: object
-    required: ['object']
-    properties:
-      object:
-        $ref: '#/definitions/Object'
-  GetAccessURLResponse:
-    type: object
-    required: ['object']
+    required: ['access_url']
     properties:
       access_url:
         type: string
