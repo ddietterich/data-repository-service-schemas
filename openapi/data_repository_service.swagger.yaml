@@ -24,13 +24,15 @@ security:
 paths:
   '/service-info':
     get:
-      summary: Returns service version and other information
+      summary: Get information about this implementation.
+      description: >-
+        May return service version and other information.
       operationId: GetServiceInfo
       responses:
         '200':
           description: Service information returned successfully
           schema:
-            $ref: '#/definitions/ServiceInfo'
+            $ref: '#/definitions/ServiceInfoResponse'
       tags:
         - DataRepositoryService
       x-swagger-router-controller: ga4gh.drs.server
@@ -42,27 +44,27 @@ paths:
         '200':
           description: Successfully found the Data Bundle.
           schema:
-            $ref: '#/definitions/Bundle'
+            $ref: '#/definitions/GetBundleResponse'
         '400':
           description: The request is malformed.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '401':
           description: The request is unauthorized.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '404':
           description: The requested Data Bundle wasn't found.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '403':
           description: The requester is not authorized to perform this action.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '500':
           description: An unexpected error occurred.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
       parameters:
         - name: bundle_id
           in: path
@@ -73,33 +75,35 @@ paths:
       x-swagger-router-controller: ga4gh.drs.server
   '/objects/{object_id}':
     get:
-      summary: Retrieve a Data Object
+      summary: Get info about a Data Object.
+      description: >-
+        Returns object metadata, and a list of access methods that can be used to fetch object bytes.
       operationId: GetObject
       responses:
         '200':
           description: The Data Object was found successfully.
           schema:
-            $ref: '#/definitions/Object'
+            $ref: '#/definitions/GetObjectResponse'
         '400':
           description: The request is malformed.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '401':
           description: The request is unauthorized.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '404':
           description: The requested Data Object wasn't found
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '403':
           description: The requester is not authorized to perform this action.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '500':
           description: An unexpected error occurred.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
       parameters:
         - name: object_id
           in: path
@@ -110,7 +114,9 @@ paths:
       x-swagger-router-controller: ga4gh.drs.server
   '/objects/{object_id}/access/{access_id}':
     get:
-      summary: Returns a fully resolvable URL that can be used to fetch the actual object bytes.
+      summary: Get a URL for fetching bytes. 
+      description: >-
+        Returns a fully resolvable URL that can be used to fetch the actual object bytes.
       operationId: GetAccessURL
       responses:
         '200':
@@ -120,23 +126,23 @@ paths:
         '400':
           description: The request is malformed.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '401':
           description: The request is unauthorized.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '404':
           description: The requested access URL wasn't found
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '403':
           description: The requester is not authorized to perform this action.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
         '500':
           description: An unexpected error occurred.
           schema:
-            $ref: '#/definitions/Error'
+            $ref: '#/definitions/ErrorResponse'
       parameters:
         - name: object_id
           in: path
@@ -146,7 +152,7 @@ paths:
           in: path
           required: true
           type: string
-          description: An 'access_id' from 'access_methods' list of a Data Object
+          description: An `access_id` from the `access_methods` list of a Data Object
       tags:
         - DataRepositoryService
       x-swagger-router-controller: ga4gh.drs.server
@@ -308,14 +314,33 @@ definitions:
           These aliases can be used to represent the Data Object's location in
           a directory (e.g. "bucket/folder/file.name") to make Data Objects
           more discoverable. They might also be used to represent
-
+  GetBundleResponse:
+    type: object
+    properties:
+      bundle:
+        $ref: '#/definitions/Bundle'
+  GetObjectResponse:
+    type: object
+    required: ['object']
+    properties:
+      object:
+        $ref: '#/definitions/Object'
   AccessURL:
     type: object
-    required: ['access_url']
+    required: ['url']
     properties:
-      access_url:
+      url:
         type: string
-        description: A fully resolvable access_url that can be used to fetch the actual object bytes.
+        description: A fully resolvable URL that can be used to fetch the actual object bytes.
+      headers:
+        type: array
+        items:
+          type: string
+        description: >-
+          An optional list of headers to include in the HTTP request to `url`.
+          These headers can be used to provide auth tokens required to fetch the object bytes.
+        example:
+          Authorization: Basic Z2E0Z2g6ZHJz
   AccessMethod:
     type: object
     required:
@@ -338,24 +363,23 @@ definitions:
         description: >-
           Type of the access method.
       access_url:
-        type: string
+        $ref: '#/definitions/AccessURL'
         description: >-
-          A fully resolvable URL string that can be used to fetch the actual object bytes.
-          Note that at least one of access_url and access_id must be provided.
+          An `AccessURL` that can be used to fetch the actual object bytes.
+          Note that at least one of `access_url` and `access_id` must be provided.
       access_id:
         type: string
         description: >-
-          An arbitrary string to be passed to the /access path to fetch an access_url.
+          An arbitrary string to be passed to the /access path to get an `AccessURL`.
           This must be unique per object.
-          Note that at least one of access_url and access_id must be provided.
+          Note that at least one of `access_url` and `access_id` must be provided.
       region:
         type: string
         description: >-
-          OPTIONAL
           Name of the region in the cloud service provider that the object belongs to.
         example:
           us-east-1
-  Error:
+  ErrorResponse:
     description:
       An object that can optionally include information about the error.
     type: object
@@ -366,7 +390,7 @@ definitions:
       status_code:
         type: integer
         description: The integer representing the HTTP status code (e.g. 200, 404).
-  ServiceInfo:
+  ServiceInfoResponse:
     type: object
     required: ['version']
     description: Placeholder for the Info Object
