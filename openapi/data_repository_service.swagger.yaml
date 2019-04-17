@@ -3,14 +3,14 @@ basePath: '/ga4gh/drs/v1'
 info:
   title: Data Repository Service
   version: 0.1.0
-  description: https://github.com/ga4gh/data-repository-service-schemas
+  description: 'https://github.com/ga4gh/data-repository-service-schemas'
   contact:
     name: GA4GH Cloud Work Stream
     email: ga4gh-cloud@ga4gh.org
     x-role: responsible developer
   license:
     name: Apache 2.0
-    url: https://raw.githubusercontent.com/ga4gh/data-repository-service-schemas/master/LICENSE
+    url: 'https://raw.githubusercontent.com/ga4gh/data-repository-service-schemas/master/LICENSE'
 schemes:
   - https
   - http
@@ -88,12 +88,12 @@ paths:
           description: The request is unauthorized.
           schema:
             $ref: '#/definitions/Error'
-        '404':
-          description: The requested Data Object wasn't found
-          schema:
-            $ref: '#/definitions/Error'
         '403':
           description: The requester is not authorized to perform this action.
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: The requested Data Object wasn't found
           schema:
             $ref: '#/definitions/Error'
         '500':
@@ -162,12 +162,12 @@ securityDefinitions:
 definitions:
   Checksum:
     type: object
-    required: ['checksum']
+    required:
+      - checksum
     properties:
       checksum:
         type: string
-        description: |-
-          The hex-string encoded checksum for the Data.
+        description: The hex-string encoded checksum for the data
       type:
         type: string
         description: |-
@@ -176,7 +176,7 @@ definitions:
 
           possible values:
           md5                # most blob stores provide a checksum using this
-          multipart-md5      # multipart uploads provide a specialized tag in S3
+          etag               # multipart uploads to blob stores
           sha256
           sha512
   Bundle:
@@ -380,7 +380,8 @@ definitions:
         description: The integer representing the HTTP status code (e.g. 200, 404).
   ServiceInfoResponse:
     type: object
-    required: ['version']
+    required:
+      - version
     description: Placeholder for the Info Object
     properties:
       version:
